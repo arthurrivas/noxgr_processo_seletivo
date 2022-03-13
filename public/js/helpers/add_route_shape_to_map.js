@@ -6,7 +6,7 @@ function addRouteShapeToMap(route) {
       // Create a polyline to display the route:
       let polyline = new H.map.Polyline(linestring, {
         style: {
-          lineWidth: 7,
+          lineWidth: 4,
           strokeColor: 'rgba(22, 219, 45, 1)'
         }
       });
