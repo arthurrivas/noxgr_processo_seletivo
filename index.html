@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="viewport" content="initial-scale=1.0, width=device-width" />
     
-    <script src="https://js.api.here.com/v3/3.1/mapsjs-core.js" type="text/javascript" charset="utf-8"></script>
-    <script src="https://js.api.here.com/v3/3.1/mapsjs-service.js" type="text/javascript" charset="utf-8"></script>
-    <script src="https://js.api.here.com/v3/3.1/mapsjs-ui.js" type="text/javascript" charset="utf-8"></script>
-    <script src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.0/mapsjs-ui.css" />
+
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
     
-        
-    <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
 
     <title>maps</title>
 </head>
@@ -26,15 +26,15 @@
     <script>
         
     //Initialize the Platform object:
-    var platform = new H.service.Platform({
-        'apikey': 'rLvtgDudEi7vvPMu61WzSxD-6unOEOhq64PozHDb03g'
+    const platform = new H.service.Platform({
+        'apikey': 'ZyS_v2aBrTs0WmdBI3kf7XfIKAyExCIuwFAdmuL9wLc'
     });
 
     // Get the default map types from the Platform object:
     var defaultLayers = platform.createDefaultLayers();
 
     // Instantiate the map:
-    var map = new H.Map(
+    const map = new H.Map(
     document.getElementById('mapContainer'),
     defaultLayers.vector.normal.map,
     {
@@ -42,71 +42,153 @@
         center: {lng:-46.949870, lat:-23.089533 }
     });
     
+    
+
     var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
     var ui = H.ui.UI.createDefault(map, defaultLayers);
+
     
-    //var startIcon = H.map.Icon()
-    /*
-    // create and add the starter point  
-    var startCordenates = {lng:-35.0315702, lat: -8.3678162}
-    var startMarker = new H.map.Marker(startCordenates);
-    map.addObject(startMarker);
 
-    var destinationCordenates = {lng: -46.9665265,lat: -23.1019916}
-    var destinationMarker = new H.map.Marker(destinationCordenates)
-    map.addObject(destinationMarker)
-    */
-    // Create the parameters for the routing request:
-    var routingParameters = {
-        'routingMode': 'fast',
-        'transportMode': 'car',
-        'origin': '-8.3678162,-35.0315702',
-        // The end point of the route:
-        'destination': '-23.1019916,-46.9665265',
-        // Include the route shape in the response
-        'return': 'polyline'
-    };
-    // Define a callback function to process the routing response:
-    var onResult = function(result) {
-    // ensure that at least one route was found
-        if (result.routes.length) {
-            result.routes[0].sections.forEach((section) => {
-                // Create a linestring to use as a point source for the route line
-                let linestring = H.geo.LineString.fromFlexiblePolyline(section.polyline);
+    let starterCordenates = {lat:-8.3678162, lng:-35.0315702}
+    let starterMarker = new H.map.Marker(starterCordenates)
+    starterMarker.setData("<h2>Ipojuca – PE</h2>")
+    starterMarker.addEventListener('tap', event =>{
+    let bubble = new H.ui.InfoBubble(
+        event.target.getGeometry(),{
+            content: event.target.getData()
+            }
+    );
+        ui.addBubble(bubble)
+    })
+    let midleCordenates = {lat:-16.723477129827657, lng:-43.85451872859102}
+    let midleMarker = new H.map.Marker(midleCordenates)
+    midleMarker.setData("<h2>Monte Carlos</h2>")
+    midleMarker.addEventListener('tap', event =>{
+    let bubble = new H.ui.InfoBubble(
+        event.target.getGeometry(),{
+            content: event.target.getData()
+            }
+    );
+        ui.addBubble(bubble)
+    })
+    let finalCordenates = {lat:-23.1019916, lng:-46.9665265}
+    let finalMarker = new H.map.Marker(finalCordenates)
+    finalMarker.setData("<h2>Louveira – SP</h2>")
+    finalMarker.addEventListener('tap', event =>{
+    let bubble = new H.ui.InfoBubble(
+        event.target.getGeometry(),{
+            content: event.target.getData()
+            }
+    );
+        ui.addBubble(bubble)
+    })
 
-                // Create a polyline to display the route:
-                let routeLine = new H.map.Polyline(linestring, {
-                style: { strokeColor: 'blue', lineWidth: 5 }
-                });
+    map.addObject(starterMarker)
+    map.addObject(midleMarker)
+    map.addObject(finalMarker)
 
-                // Create a marker for the start point:
-                let startMarker = new H.map.Marker(section.departure.place.location);
 
-                // Create a marker for the end point:
-                let endMarker = new H.map.Marker(section.arrival.place.location);
 
-                // Add the route polyline and the two markers to the map:
-                map.addObjects([routeLine, startMarker, endMarker]);
+    // Now use the map as required...
+    calculateRouteFromAtoB(platform,starterCordenates,midleCordenates);
+    calculateRouteFromAtoB(platform,midleCordenates,finalCordenates)
 
-                // Set the map's viewport to make the whole route visible:
-                map.getViewModel().setLookAtData({bounds: routeLine.getBoundingBox()});
-            });
-        }
-    };
+    function calculateRouteFromAtoB(platform,originCordenate,destinyCordenate) {
+        var router = platform.getRoutingService(null, 8),
+            routeRequestParams = {
+                routingMode: 'fast',
+                transportMode: 'car',
+                origin: `${originCordenate.lat},${originCordenate.lng}`, 
+                destination: `${destinyCordenate.lat},${destinyCordenate.lng}`,
+                return: 'polyline,turnByTurnActions,actions,instructions'
+            };
 
-    // Get an instance of the routing service version 8:
-    var router = platform.getRoutingService(null, 8);
+        router.calculateRoute(
+            routeRequestParams,
+            onSuccess,
+            onError
+        );
+    }
 
-    // Call calculateRoute() with the routing parameters,
-    // the callback and an error callback function (called if a
-    // communication error occurs):
-    router.calculateRoute(routingParameters, onResult,
-        function(error) {
-            alert(error.message);
+/**
+ * This function will be called once the Routing REST API provides a response
+ * @param {Object} result A JSONP object representing the calculated route
+ *
+ * see: http://developer.here.com/rest-apis/documentation/routing/topics/resource-type-calculate-route.html
+ */
+function onSuccess(result) {
+  var route = result.routes[0];
+
+  /*
+   * The styling of the route response on the map is entirely under the developer's control.
+   * A representative styling can be found the full JS + HTML code of this example
+   * in the functions below:
+   */
+  addRouteShapeToMap(route);
+  
+}
+
+/**
+ * This function will be called if a communication error occurs during the JSON-P request
+ * @param {Object} error The error message received.
+ */
+function onError(error) {
+  alert('Can\'t reach the remote server');
+}
+
+// add a resize listener to make sure that the map occupies the whole container
+window.addEventListener('resize', () => map.getViewPort().resize());
+
+/**
+ * Creates a H.map.Polyline from the shape of the route and adds it to the map.
+ * @param {Object} route A route as received from the H.service.RoutingService
+ */
+function addRouteShapeToMap(route) {
+  route.sections.forEach((section) => {
+    // decode LineString from the flexible polyline
+    let linestring = H.geo.LineString.fromFlexiblePolyline(section.polyline);
+
+    // Create a polyline to display the route:
+    let polyline = new H.map.Polyline(linestring, {
+      style: {
+        lineWidth: 4,
+        strokeColor: 'rgba(0, 128, 255, 0.7)'
+      }
     });
 
+    // Add the polyline to the map
+    map.addObject(polyline);
+    // And zoom to its bounding rectangle
+    map.getViewModel().setLookAtData({
+      bounds: polyline.getBoundingBox()
+    });
+  });
 
-    
+}
+  // Hold a reference to any infobubble opened
+  var bubble;
+
+/**
+ * Opens/Closes a infobubble
+ * @param {H.geo.Point} position The location on the map.
+ * @param {String} text          The contents of the infobubble.
+ */
+function openBubble(position, text) {
+  if (!bubble) {
+    bubble = new H.ui.InfoBubble(
+      position,
+      // The FO property holds the province name.
+      {content: text});
+    ui.addBubble(bubble);
+  } else {
+    bubble.setPosition(position);
+    bubble.setContent(text);
+    bubble.open();
+  }
+}
+
+
+
 
     </script>
    
