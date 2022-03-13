@@ -15,7 +15,7 @@ let midleIcon = new H.map.Icon('http://localhost:5000/imgs/yellow-flag-icon.png'
                 {size: {w:40,h: 40}})
 let midleCordenates = { lat: -16.723477129827657, lng: -43.85451872859102 };
 let midleMarker = new H.map.Marker(midleCordenates,{icon : midleIcon});
-midleMarker.setData("<h2>Monte Carlos-MG</h2>");
+midleMarker.setData("<h2>Montes Claros-MG</h2>");
 midleMarker.addEventListener("tap", (event) => {
   let bubble = new H.ui.InfoBubble(event.target.getGeometry(), {
     content: event.target.getData(),
